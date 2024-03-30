@@ -10,7 +10,7 @@ const UserSchema = new schema({
   },
   username:{
     type: String,
-    unique: true,
+    // unique: true,
   },
   bio:{
     type: String

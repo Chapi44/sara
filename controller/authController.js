@@ -108,9 +108,10 @@ const register = async (req, res) => {
     const role = isFirstAccount ? "admin" : "user";
 
     // Check if username and bio are provided, otherwise assign default values
-    if (!username) username = "";
+    if (!username) username = null; // Set username to null if empty
     if (!bio) bio = "";
 
+    // Create the user directly without checking username
     const user = await User.create({
       name,
       email,
@@ -138,9 +139,9 @@ const register = async (req, res) => {
       { expiresIn: tokenExpiration }
     );
 
-    res.status(StatusCodes.CREATED).json({
+    return res.status(StatusCodes.CREATED).json({
       success: true,
-      message: "successfully registered",
+      message: "Successfully registered",
       token,
       userId: user._id,
       email: user.email,
@@ -149,9 +150,10 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };
+
 
 
 const signin = async (req, res) => {
