@@ -1,16 +1,16 @@
 const Product = require("../model/post");
 const Like = require("../model/like");
-const Comment = require("../model/comment");
+const Follow = require("../model/comment");  
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const path = require("path");
 const baseURL = process.env.BASE_URL;
 
 const createposts = async (req, res) => {
-  const userId=req.user.userId;
-  console.log(userId);
+  // const userId=req.user.userId;
+  // console.log(userId);
   try {
-    const { name, description  } = req.body;
+    const { name, description ,userId , location} = req.body;
 
     // Construct image paths with base URL
     const pictures = req.files.map(file => baseURL + "/uploads/posts/" + file.filename);
@@ -19,7 +19,8 @@ const createposts = async (req, res) => {
    name,
    description ,
    images: pictures,
-      user:userId
+      user:userId,
+      location
     });
 
     if (!userId) {
@@ -196,7 +197,8 @@ const uploadImage = async (req, res) => {
 
 const likeProduct = async (req, res) => {
   try {
-    const { productId, userId } = req.body;
+    const { id:  productId } = req.params;
+    const { userId } = req.body;
     // const userId = req.user.userId;
 
     // Check if the user has already liked the product
@@ -242,24 +244,55 @@ const likeProduct = async (req, res) => {
     res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
   }
 };
+
+
 const createComment = async (req, res) => {
-  try {
-    req.body.user = req.user.userId;
-    const comment = new Comment(req.body);
-    await comment.save();
+	try {
+		const { text,userId } = req.body;
+		const postId = req.params.id;
+		// const userId = req.user._id;
+		const userProfilePic = req.user.profilePic;
+		const username = req.user.username;
 
-    // Add the comment to the product's comments
-    const product = await Product.findByIdAndUpdate(
-      req.body.product,
-      { $push: { comments: comment._id } },
-      { new: true }
-    );
+		if (!text) {
+			return res.status(400).json({ error: "Text field is required" });
+		}
 
-    res.status(StatusCodes.CREATED).json({ comment, product });
-  } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
-  }
+		const post = await Post.findById(postId);
+		if (!post) {
+			return res.status(404).json({ error: "Post not found" });
+		}
+
+		const reply = { userId, text, userProfilePic, username };
+
+		post.replies.push(reply);
+		await post.save();
+
+		res.status(200).json(reply);
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
 };
+
+
+// const createComment = async (req, res) => {
+//   try {
+//     req.body.user = req.user.userId;
+//     const comment = new Comment(req.body);
+//     await comment.save();
+
+//     // Add the comment to the product's comments
+//     const product = await Product.findByIdAndUpdate(
+//       req.body.product,
+//       { $push: { comments: comment._id } },
+//       { new: true }
+//     );
+
+//     res.status(StatusCodes.CREATED).json({ comment, product });
+//   } catch (error) {
+//     res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
+//   }
+// };
 
 module.exports = {
   createposts,

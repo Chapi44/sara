@@ -17,6 +17,30 @@ const ProductSchema = new mongoose.Schema(
    
   },
 
+  location:{
+    type: [String],
+    
+  },
+  		replies: [
+			{
+				userId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
+				},
+				text: {
+					type: String,
+					required: true,
+				},
+				userProfilePic: {
+					type: String,
+				},
+				username: {
+					type: String,
+				},
+			},
+		],
+
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",

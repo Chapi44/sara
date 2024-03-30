@@ -89,7 +89,14 @@ const updateUser = async (req, res) => {
 
     // Update name if available
     if (req.body.name) {
-      updatedUser.name = req.body.name;
+      updatedUser.name = req.body.name;  
+    }
+
+    if (req.body.bio) {
+      updatedUser.bio = req.body.bio;
+    }
+    if (req.body.username) {
+      updatedUser.username = req.body.username;
     }
 
     // Update email if available
@@ -104,9 +111,9 @@ const updateUser = async (req, res) => {
     }
 
     // Update role if available
-    if (req.body.role) {
-      updatedUser.role = req.body.role;
-    }
+    // if (req.body.role) {
+    //   updatedUser.role = req.body.role;
+    // }
 
     // Handle pictures update if available
     if (req.files && req.files.length > 0) {
@@ -176,18 +183,18 @@ const updateUserPassword = async (req, res) => {
 const showCurrentUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ user: req.user });
 };
-const deleteAllUsers = async (req, res) => {
-  try {
-    console.log("Before deleting all users");
-    const result = await User.deleteMany({});
-    console.log("After deleting all users", result);
+// const deleteAllUsers = async (req, res) => {
+//   try {
+//     console.log("Before deleting all users");
+//     const result = await User.deleteMany({});
+//     console.log("After deleting all users", result);
 
-    res.status(200).json({ message: "All users deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting all users:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
+//     res.status(200).json({ message: "All users deleted successfully" });
+//   } catch (error) {
+//     console.error("Error deleting all users:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 
 // //addition to handle caals and videos
 // exports.  startAudioCall = catchAsync(async (req, res, next) => {
@@ -329,7 +336,7 @@ module.exports = {
   getUserById,
   deleteuser,
   updateUser,
-  deleteAllUsers,
+  // deleteAllUsers,
   updateUserPassword,
   showCurrentUser,
 };

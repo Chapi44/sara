@@ -43,7 +43,7 @@ router
   .patch(updatepostbyid)
   .delete(deletepostbyid);
 
-router.post("/like", likeProduct);
+router.post("/like/:id", likeProduct);
 
 router.post("/comments", authenticateUser, createComment);
 // router.route("/:id/reviews").get(getSingleProductReviews);

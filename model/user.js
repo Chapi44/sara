@@ -8,6 +8,13 @@ const UserSchema = new schema({
     type: String,
     required: true,
   },
+  username:{
+    type: String,
+    unique: true,
+  },
+  bio:{
+    type: String
+  },
   // phonenumber:{
   //   type: String,
   //   required: true,

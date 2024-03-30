@@ -4,7 +4,7 @@ const {
   getUserById,
   deleteuser,
   updateUser,
-  deleteAllUsers,
+ 
   updateUserPassword,
   showCurrentUser,
 } = require("../controller/usercontroller");
@@ -44,11 +44,11 @@ router.patch(
   updateUserPassword
 );
 
-router.delete(
-  "/deleteall",
-  // [authenticateUser, authorizePermissions1("admin")],
-  deleteAllUsers
-);
+// router.delete(
+//   "/deleteall",
+//   // [authenticateUser, authorizePermissions1("admin")],
+//   deleteAllUsers
+// );
 
 router.route("/showMe").get(authenticateUser, showCurrentUser);
 
