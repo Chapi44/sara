@@ -97,48 +97,47 @@ const { attachCookiesToResponse, createTokenUser } = require("../utils");
 
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    let { name, email, password, username, bio } = req.body;
 
     const emailAlreadyExists = await User.findOne({ email });
     if (emailAlreadyExists) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ error: "Email already exists" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Email already exists" });
     }
-
-    // const baseURL = "http://localhost:4500"; // Replace with your actual base URL
 
     const isFirstAccount = (await User.countDocuments({})) === 0;
     const role = isFirstAccount ? "admin" : "user";
+
+    // Check if username and bio are provided, otherwise assign default values
+    if (!username) username = "";
+    if (!bio) bio = "";
 
     const user = await User.create({
       name,
       email,
       password,
       role,
+      username,
+      bio
     });
 
     const secretKey = process.env.JWT_SECRET;
     const tokenExpiration = process.env.JWT_LIFETIME;
 
     if (!secretKey) {
-      throw new CustomError.InternalServerError(
-        "JWT secret key is not configured."
-      );
+      throw new CustomError.InternalServerError("JWT secret key is not configured.");
     }
 
     if (!tokenExpiration) {
-      throw new CustomError.InternalServerError(
-        "Token expiration is not configured."
-      );
+      throw new CustomError.InternalServerError("Token expiration is not configured.");
     }
+
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
+      { userId: user._id, email: user.email, role: user.role, username: user.username, bio: user.bio },
       secretKey,
       { expiresIn: tokenExpiration }
     );
-    // const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiration });
+
     res.status(StatusCodes.CREATED).json({
       success: true,
       message: "successfully registered",
@@ -150,11 +149,10 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "Internal server error" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };
+
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
