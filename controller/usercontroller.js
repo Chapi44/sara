@@ -78,29 +78,85 @@ const deleteuser = async (req, res) => {
 //   return res.status(StatusCodes.OK).json({ user: tokenUser });
 // };
 
+// const updateUser = async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+//     let updatedUser = await User.findById(userId);
+
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Update name if available
+//     if (req.body.name) {
+//       updatedUser.name = req.body.name;  
+//     }
+
+//     if (req.body.bio) {
+//       updatedUser.bio = req.body.bio;
+//     }
+//     if (req.body.username) {
+//       updatedUser.username = req.body.username;
+//     }
+
+//     // Update email if available
+//     if (req.body.email) {
+//       updatedUser.email = req.body.email;
+//     }
+
+//     // Update password if available
+//     if (req.body.password) {
+//       const salt = await bcrypt.genSalt(10);
+//       updatedUser.password = await bcrypt.hash(req.body.password, salt);
+//     }
+
+//     // Update role if available
+//     // if (req.body.role) {
+//     //   updatedUser.role = req.body.role;
+//     // }
+
+//     // Handle pictures update if available
+//     if (req.files && req.files.length > 0) {
+//       // Assuming pictures is an array of strings representing image URLs
+//       const newPictures = req.files.map(
+//         (file) => `${process.env.BASE_URL}/uploads/${file.filename}`
+//       );
+//       updatedUser.pictures = newPictures;
+//     }
+
+//     await updatedUser.save();
+
+//     res.status(200).json({
+//       message: "User updated successfully",
+//       user: { ...updatedUser._doc, password: undefined },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+
 const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
     let updatedUser = await User.findById(userId);
 
     if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Update name if available
-    if (req.body.name) {
-      updatedUser.name = req.body.name;  
-    }
+    // Update name, bio, and username if available
+    if (req.body.name) updatedUser.name = req.body.name;  
+    if (req.body.bio) updatedUser.bio = req.body.bio;
+    if (req.body.username) updatedUser.username = req.body.username;
 
-    if (req.body.bio) {
-      updatedUser.bio = req.body.bio;
-    }
-    if (req.body.username) {
-      updatedUser.username = req.body.username;
-    }
-
-    // Update email if available
+    // Update email if available and validate format
     if (req.body.email) {
+      const emailAlreadyExists = await User.findOne({ email: req.body.email });
+      if (emailAlreadyExists) {
+        return res.status(400).json({ error: "Email already exists" });
+      }
       updatedUser.email = req.body.email;
     }
 
@@ -110,14 +166,8 @@ const updateUser = async (req, res) => {
       updatedUser.password = await bcrypt.hash(req.body.password, salt);
     }
 
-    // Update role if available
-    // if (req.body.role) {
-    //   updatedUser.role = req.body.role;
-    // }
-
     // Handle pictures update if available
     if (req.files && req.files.length > 0) {
-      // Assuming pictures is an array of strings representing image URLs
       const newPictures = req.files.map(
         (file) => `${process.env.BASE_URL}/uploads/${file.filename}`
       );
@@ -126,13 +176,21 @@ const updateUser = async (req, res) => {
 
     await updatedUser.save();
 
+    // Respond with updated user data (excluding password)
     res.status(200).json({
       message: "User updated successfully",
-      user: { ...updatedUser._doc, password: undefined },
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        bio: updatedUser.bio,
+        pictures: updatedUser.pictures
+      },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
