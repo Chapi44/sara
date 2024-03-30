@@ -39,7 +39,7 @@ const configureMulter = (subfolder, maxFiles) => {
     storage: storage,
     limits: {
       files: maxFiles,
-      fileSize: 1 * 1024 * 1024, // 1MB limit
+      fileSize: 10 * 1024 * 1024, // 1MB limit
     },
     fileFilter: fileFilter,
   });

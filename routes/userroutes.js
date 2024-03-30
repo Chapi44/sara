@@ -4,7 +4,7 @@ const {
   getUserById,
   deleteuser,
   updateUser,
- 
+  followUnFollowUser,
   updateUserPassword,
   showCurrentUser,
 } = require("../controller/usercontroller");
@@ -38,6 +38,7 @@ router.patch(
   multerMiddleware("profile", 1),
   updateUser
 );
+router.post('/:id/follow',  followUnFollowUser);
 router.patch(
   "/updateUserPassword/:id",
   // authenticateUser,

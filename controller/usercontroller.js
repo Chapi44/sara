@@ -169,7 +169,7 @@ const updateUser = async (req, res) => {
     // Handle pictures update if available
     if (req.files && req.files.length > 0) {
       const newPictures = req.files.map(
-        (file) => `${process.env.BASE_URL}/uploads/${file.filename}`
+        (file) => `${process.env.BASE_URL}/uploads/profile/${file.filename}`
       );
       updatedUser.pictures = newPictures;
     }
@@ -211,6 +211,58 @@ const updateUserPassword = async (req, res) => {
   await user.save();
   res.status(StatusCodes.OK).json({ msg: "Success! Password Updated." });
 };
+
+
+const followUnFollowUser = async (req, res) => {
+  try {
+    const { userId } = req.body; // Assuming userId is passed in the request body
+
+    // Check if userId is provided
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const { id } = req.params;
+    const userToModify = await User.findById(id);
+    
+    // Check if userToModify exists
+    if (!userToModify) {
+      return res.status(404).json({ error: "User to modify not found" });
+    }
+
+    const currentUser = await User.findById(userId);
+
+    // Check if currentUser exists
+    if (!currentUser) {
+      return res.status(404).json({ error: "Current user not found" });
+    }
+
+    // Check if the user is trying to follow/unfollow themselves
+    if (id === userId.toString()) {
+      return res.status(400).json({ error: "You cannot follow/unfollow yourself" });
+    }
+
+    // Check if the current user is already following the userToModify
+    const isFollowing = currentUser.following && currentUser.following.includes(id);
+
+    if (isFollowing) {
+      // Unfollow user
+      await User.findByIdAndUpdate(id, { $pull: { followers: userId } });
+      await User.findByIdAndUpdate(userId, { $pull: { following: id } });
+      return res.status(200).json({ message: "User unfollowed successfully" });
+    } else {
+      // Follow user
+      await User.findByIdAndUpdate(id, { $push: { followers: userId } });
+      await User.findByIdAndUpdate(userId, { $push: { following: id } });
+      return res.status(200).json({ message: "User followed successfully" });
+    }
+  } catch (err) {
+    console.error("Error in followUnFollowUser: ", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 
 // const updateUseremailandPassword = async (req, res) => {
 //   const { email, oldPassword, newPassword } = req.body;
@@ -396,5 +448,6 @@ module.exports = {
   updateUser,
   // deleteAllUsers,
   updateUserPassword,
+  followUnFollowUser, 
   showCurrentUser,
 };

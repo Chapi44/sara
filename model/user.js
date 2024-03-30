@@ -15,23 +15,7 @@ const UserSchema = new schema({
   bio:{
     type: String
   },
-  // phonenumber:{
-  //   type: String,
-  //   required: true,
-  // },
-  // lastname: {
-  //   type: String,
-  //   required: true,
-  // },
-  // Age: {
-  //   type: String,
-  //   required: true,
-  // },
-  // Gender: {
-  //   type: String,
-  //   enum: ['male', 'female','other'],
-  //   required: true,
-  // },
+ 
   pictures: {
     type: [String],
     default: [],

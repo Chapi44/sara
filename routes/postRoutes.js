@@ -8,9 +8,9 @@ const {
     getSinglepost,
     updatepostbyid,
     deletepostbyid,
-    uploadImage,
+
     likeProduct,
-    createComment,
+
   } = require("../controller/postController");
 
 const {
@@ -35,8 +35,6 @@ router.route("/").post(
   createposts
   ).get(getAllposts);
 
-router.route("/uploadImage").post([authenticateUser], uploadImage);
-
 router
   .route("/:id")
   .get(getSinglepost)
@@ -45,7 +43,6 @@ router
 
 router.post("/like/:id", likeProduct);
 
-router.post("/comments", authenticateUser, createComment);
-// router.route("/:id/reviews").get(getSingleProductReviews);
+
 
 module.exports = router;
