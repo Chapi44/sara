@@ -3,7 +3,7 @@ const Like = require("../model/like");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
 const path = require("path");
-const baseURL = process.env.BASE_URL;
+const baseURL = `http://sarada.canvacodes.com:4500`;
 
 const createposts = async (req, res) => {
   // const userId=req.user.userId;
